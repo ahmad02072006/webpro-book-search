@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Nightshelf — search millions of books and build your own reading shelf.">
+  <title>Nightshelf — Find your next read</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+/* ============================================================
+   Nightshelf — midnight library theme
+   ============================================================ */
+
+:root {
+  --bg: #0e1120;
+  --bg-2: #141830;
+  --surface: #1a1f3a;
+  --surface-2: #232950;
+  --ink: #ecebf4;
+  --muted: #9b9eba;
+  --line: rgba(255, 255, 255, 0.09);
+
+  --accent: #f2b950;
+  --accent-ink: #2a1c00;
+  --violet: #8b7cf6;
+  --danger: #ff7a7a;
+
+  --wood-1: #6b4a32;
+  --wood-2: #4a3322;
+  --wood-3: #2f2015;
+
+  --radius: 14px;
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { color-scheme: dark; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--ink);
+  line-height: 1.5;
+  background:
+    radial-gradient(1.2px 1.2px at 12% 18%, rgba(255,255,255,.55), transparent 60%),
+    radial-gradient(1px 1px at 78% 12%, rgba(255,255,255,.45), transparent 60%),
+    radial-gradient(1.4px 1.4px at 90% 40%, rgba(255,255,255,.4), transparent 60%),
+    radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,.3), transparent 60%),
+    radial-gradient(900px 500px at 85% -10%, rgba(139,124,246,.22), transparent 70%),
+    radial-gradient(700px 400px at -5% 10%, rgba(242,185,80,.10), transparent 70%),
+    linear-gradient(180deg, var(--bg), var(--bg-2));
+  background-attachment: fixed;
+}
+
+h1, h2 { font-family: var(--font-display); line-height: 1.15; margin: 0; }
+
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+[hidden] { display: none !important; }
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0);
+  white-space: nowrap; border: 0;
+}
+
+/* ---------- top bar ---------- */
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px clamp(16px, 4vw, 40px);
+  background: rgba(14, 17, 32, 0.78);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.brand-moon {
+  display: grid;
+  place-items: center;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 1.15rem;
+}
+
+.tabs { display: flex; gap: 6px; }
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 500;
+  transition: background .2s, color .2s;
+}
+.tab:hover { color: var(--ink); }
+.tab[aria-selected="true"] {
+  background: var(--surface-2);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+.pill {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  padding: 0 7px;
+  height: 20px;
+  border-radius: 999px;
+  background: rgba(242, 185, 80, 0.18);
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* ---------- layout ---------- */
+main {
+  width: min(1100px, 100% - 32px);
+  margin: 0 auto;
+  padding: 36px 0 80px;
+}
+
+/* ---------- hero + search ---------- */
+.hero { text-align: center; padding: 28px 0 12px; }
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.lead {
+  max-width: 52ch;
+  margin: 14px auto 28px;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+.search {
+  display: flex;
+  gap: 0;
+  max-width: 680px;
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+  transition: border-color .2s, box-shadow .2s;
+}
+.search:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35), 0 0 0 3px rgba(242, 185, 80, 0.18);
+}
+
+.search select,
+.search input {
+  background: transparent;
+  border: 0;
+  outline: 0;
+}
+
+.search select {
+  padding: 0 12px 0 16px;
+  color: var(--accent);
+  font-weight: 600;
+  border-right: 1px solid var(--line);
+  border-radius: 0;
+}
+.search select option { background: var(--surface); color: var(--ink); }
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 16px;
+}
+.search input::placeholder { color: var(--muted); }
+
+.search button {
+  padding: 0 26px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+  transition: transform .15s, filter .2s;
+}
+.search button:hover { filter: brightness(1.08); }
+.search button:active { transform: scale(0.97); }
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+}
+.chips-label { color: var(--muted); font-size: 0.9rem; }
+
+.chip {
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.9rem;
+  transition: background .2s, border-color .2s;
+}
+.chip:hover { background: var(--surface-2); border-color: var(--violet); }
+
+/* ---------- status line ---------- */
+.status {
+  min-height: 1.5em;
+  margin: 28px 0 8px;
+  color: var(--muted);
+  text-align: center;
+}
+.status.is-error { color: var(--danger); }
+
+/* ============================================================
+   The bookshelf grid
+   Columns have no gap, and every card draws its own plank,
+   so each row looks like one continuous wooden shelf.
+   ============================================================ */
+.shelf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 0;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0 0 26px;
+  text-align: center;
+}
+
+/* the slot holds the cover and draws the plank it stands on */
+.slot {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: 26px 14px 0;
+  margin-bottom: 0;
+}
+.slot::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -14px;
+  height: 14px;
+  background: linear-gradient(180deg, var(--wood-1), var(--wood-2) 60%, var(--wood-3));
+  box-shadow: 0 8px 14px rgba(0, 0, 0, 0.45);
+  z-index: 0;
+}
+
+.cover-btn {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 124px;
+  aspect-ratio: 2 / 3;
+  padding: 0;
+  border: 0;
+  border-radius: 3px 6px 6px 3px;
+  background: var(--surface-2);
+  overflow: hidden;
+  box-shadow:
+    -3px 0 0 rgba(0, 0, 0, 0.25) inset,
+    0 14px 18px rgba(0, 0, 0, 0.5);
+  transform-origin: bottom center;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.cover-btn:hover,
+.cover-btn:focus-visible {
+  transform: translateY(-8px) rotate(-2deg);
+  box-shadow:
+    -3px 0 0 rgba(0, 0, 0, 0.25) inset,
+    0 24px 26px rgba(0, 0, 0, 0.55);
+}
+
+.cover-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cover-fallback {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  line-height: 1.2;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+.cover-fallback::before {
+  content: "";
+  width: 34px; height: 2px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.badge {
+  position: absolute;
+  top: 8px; left: 0;
+  z-index: 2;
+  padding: 2px 8px 2px 8px;
+  border-radius: 0 4px 4px 0;
+  background: var(--violet);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+.badge[data-status="want"]    { background: var(--violet); }
+.badge[data-status="reading"] { background: var(--accent); color: var(--accent-ink); }
+.badge[data-status="done"]    { background: #4fc58a; color: #06281a; }
+
+.card-text {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin-top: 28px;
+  padding: 0 14px;
+}
+
+.card-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.card-sub {
+  margin: 3px 0 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+/* ---------- skeleton loading ---------- */
+.skeleton .cover-btn {
+  background: linear-gradient(100deg, var(--surface) 30%, var(--surface-2) 50%, var(--surface) 70%);
+  background-size: 250% 100%;
+  animation: shimmer 1.3s linear infinite;
+  box-shadow: none;
+  pointer-events: none;
+}
+.skeleton .line {
+  width: 80%; height: 10px;
+  margin: 12px auto 0;
+  border-radius: 6px;
+  background: var(--surface);
+}
+.skeleton .line.short { width: 50%; margin-top: 8px; }
+
+@keyframes shimmer {
+  from { background-position: 100% 0; }
+  to   { background-position: -100% 0; }
+}
+
+/* ---------- load more ---------- */
+.more-wrap { display: flex; justify-content: center; margin-top: 36px; }
+
+.ghost {
+  padding: 12px 28px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font-weight: 500;
+  transition: border-color .2s, background .2s;
+}
+.ghost:hover { border-color: var(--accent); background: var(--surface-2); }
+.ghost:disabled { opacity: 0.5; cursor: wait; }
+
+/* ---------- shelf tab ---------- */
+.shelf-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.shelf-head h2 { font-size: 2rem; }
+
+.filters { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.9rem;
+  transition: background .2s, color .2s, border-color .2s;
+}
+.filter:hover { color: var(--ink); }
+.filter.is-active {
+  background: var(--surface-2);
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+.empty {
+  max-width: 44ch;
+  margin: 60px auto;
+  text-align: center;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+/* ---------- detail dialog ---------- */
+dialog {
+  width: min(760px, calc(100% - 32px));
+  max-height: calc(100vh - 48px);
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  overflow: auto;
+}
+dialog::backdrop {
+  background: rgba(5, 7, 16, 0.72);
+  backdrop-filter: blur(3px);
+}
+dialog[open] { animation: pop .22s ease; }
+
+@keyframes pop {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+
+.close {
+  position: absolute;
+  top: 14px; right: 14px;
+  width: 36px; height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface-2);
+  z-index: 2;
+}
+.close:hover { border-color: var(--accent); }
+
+.detail-body {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 28px;
+  padding: 32px;
+}
+
+.detail-cover {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 4px 8px 8px 4px;
+  overflow: hidden;
+  background: var(--surface-2);
+  box-shadow: -4px 0 0 rgba(0, 0, 0, 0.25) inset, 0 18px 30px rgba(0, 0, 0, 0.5);
+}
+.detail-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.detail-cover .cover-fallback { font-size: 1.15rem; }
+
+.detail-info h2 { font-size: 1.9rem; padding-right: 36px; }
+.detail-author { margin: 8px 0 0; color: var(--accent); font-weight: 500; }
+.detail-meta { margin: 6px 0 0; color: var(--muted); font-size: 0.92rem; }
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.tags li {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.detail-label {
+  margin: 24px 0 8px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.status-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.status-buttons button {
+  padding: 9px 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-weight: 500;
+  transition: background .2s, border-color .2s, color .2s;
+}
+.status-buttons button:hover { border-color: var(--accent); }
+.status-buttons button[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  margin-top: 22px;
+}
+.detail-actions a { color: var(--violet); font-size: 0.92rem; }
+
+.danger {
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 122, 122, 0.4);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--danger);
+  font-size: 0.9rem;
+}
+.danger:hover { background: rgba(255, 122, 122, 0.1); }
+
+/* ---------- small screens ---------- */
+@media (max-width: 640px) {
+  .top { flex-direction: column; align-items: flex-start; }
+  .search { flex-wrap: wrap; border-radius: 22px; }
+  .search select { padding: 10px 14px; border-right: 0; }
+  .search input { flex-basis: 60%; }
+  .search button { padding: 12px 22px; width: 100%; margin-top: 6px; }
+
+  .shelf-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .cover-btn { width: 108px; }
+
+  .detail-body { grid-template-columns: 1fr; padding: 24px; }
+  .detail-cover { width: 150px; margin: 0 auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+  </style>
+  <link rel="stylesheet" href="../skip-link.css">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body class="portfolio-document">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="portfolio-hero" aria-label="Course navigation">
+    <nav class="portfolio-nav" aria-label="Main navigation">
+      <a class="portfolio-brand" href="../index.html">Ochilov Akhmadjon</a>
+      <div class="portfolio-links">
+        <a href="../index.html">Home</a>
+        <a href="../index.html#weeks">Weeks</a>
+        <a href="../Project%20Submission/index.html">Project Submission</a>
+        <a href="../index.html#about">About</a>
+      </div>
+      <a class="portfolio-cta" href="../index.html#weeks">All weeks</a>
+    </nav>
+    <a class="portfolio-back" href="../index.html#weeks">← Back to all weeks</a>
+  </header>
+
+
+  <header class="top">
+    <a class="brand" href="./">
+      <span class="brand-moon" aria-hidden="true">☾</span>
+      <span>Nightshelf</span>
+    </a>
+
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab" role="tab" id="tab-discover" aria-controls="panel-discover" aria-selected="true">Discover</button>
+      <button class="tab" role="tab" id="tab-shelf" aria-controls="panel-shelf" aria-selected="false">
+        My shelf <span class="pill" id="shelf-count">0</span>
+      </button>
+    </nav>
+  </header>
+
+  <main id="main-content" tabindex="-1">
+    <!-- ============ DISCOVER ============ -->
+    <section id="panel-discover" role="tabpanel" aria-labelledby="tab-discover">
+      <div class="hero">
+        <h1>What are you reading tonight?</h1>
+        <p class="lead">Search millions of books from Open Library, then pin the good ones to your own shelf.</p>
+
+        <form id="search-form" class="search" role="search">
+          <label class="sr-only" for="mode">Search by</label>
+          <select id="mode" name="mode">
+            <option value="q">Anything</option>
+            <option value="title">Title</option>
+            <option value="author">Author</option>
+            <option value="subject">Subject</option>
+          </select>
+
+          <label class="sr-only" for="query">Search query</label>
+          <input id="query" name="query" type="search" placeholder="e.g. Dune, Murakami, space opera" required minlength="2" autocomplete="off">
+
+          <button type="submit">Search</button>
+        </form>
+
+        <div class="chips" aria-label="Quick picks">
+          <span class="chips-label">Try:</span>
+          <button type="button" class="chip" data-mode="subject" data-q="fantasy">Fantasy</button>
+          <button type="button" class="chip" data-mode="subject" data-q="mystery">Mystery</button>
+          <button type="button" class="chip" data-mode="subject" data-q="science fiction">Sci-fi</button>
+          <button type="button" class="chip" data-mode="subject" data-q="poetry">Poetry</button>
+          <button type="button" class="chip" data-mode="author" data-q="Haruki Murakami">Murakami</button>
+          <button type="button" class="chip" data-mode="title" data-q="the little prince">The Little Prince</button>
+        </div>
+      </div>
+
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+      <div id="results" class="shelf-grid" aria-busy="false"></div>
+
+      <div class="more-wrap">
+        <button id="load-more" class="ghost" type="button" hidden>Load more books</button>
+      </div>
+    </section>
+
+    <!-- ============ MY SHELF ============ -->
+    <section id="panel-shelf" role="tabpanel" aria-labelledby="tab-shelf" hidden>
+      <div class="shelf-head">
+        <h2>My shelf</h2>
+        <div class="filters" id="shelf-filters" role="group" aria-label="Filter shelf">
+          <button class="filter is-active" data-filter="all" type="button">All <span class="pill" data-count="all">0</span></button>
+          <button class="filter" data-filter="want" type="button">Want to read <span class="pill" data-count="want">0</span></button>
+          <button class="filter" data-filter="reading" type="button">Reading <span class="pill" data-count="reading">0</span></button>
+          <button class="filter" data-filter="done" type="button">Finished <span class="pill" data-count="done">0</span></button>
+        </div>
+      </div>
+
+      <p id="shelf-empty" class="empty" hidden>Nothing here yet. Open any book and tap <strong>Want to read</strong> to start your shelf.</p>
+      <div id="shelf-list" class="shelf-grid"></div>
+    </section>
+  </main>
+
+  <!-- ============ BOOK DETAIL ============ -->
+  <dialog id="detail" aria-labelledby="detail-title">
+    <button class="close" id="detail-close" type="button" aria-label="Close details">✕</button>
+
+    <div class="detail-body">
+      <div class="detail-cover" id="detail-cover"></div>
+
+      <div class="detail-info">
+        <h2 id="detail-title"></h2>
+        <p class="detail-author" id="detail-author"></p>
+        <p class="detail-meta" id="detail-meta"></p>
+        <ul class="tags" id="detail-tags"></ul>
+
+        <p class="detail-label">Shelve it as</p>
+        <div class="status-buttons" id="detail-status" role="group" aria-label="Reading status">
+          <button type="button" data-status="want">Want to read</button>
+          <button type="button" data-status="reading">Reading</button>
+          <button type="button" data-status="done">Finished</button>
+        </div>
+
+        <div class="detail-actions">
+          <button type="button" class="danger" id="detail-remove" hidden>Remove from shelf</button>
+          <a id="detail-link" href="#" target="_blank" rel="noopener noreferrer">View on Open Library ↗</a>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+/* ============================================================
+   Nightshelf — book search + personal shelf
+   Data: Open Library Search API (free, no key)
+   Saved shelf: localStorage
+   ============================================================ */
+
+const API_URL = "https://openlibrary.org/search.json";
+const PAGE_SIZE = 18;
+const FIELDS = "key,title,author_name,first_publish_year,cover_i,subject,number_of_pages_median";
+const STORAGE_KEY = "nightshelf.v1";
+
+const STATUS_LABELS = {
+  want: "Want to read",
+  reading: "Reading",
+  done: "Finished",
+};
+
+/* ---------- tiny helpers ---------- */
+const $ = (selector, root = document) => root.querySelector(selector);
+const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+
+/* ---------- DOM references ---------- */
+const form = $("#search-form");
+const modeSelect = $("#mode");
+const queryInput = $("#query");
+const statusEl = $("#status");
+const resultsEl = $("#results");
+const loadMoreBtn = $("#load-more");
+
+const tabDiscover = $("#tab-discover");
+const tabShelf = $("#tab-shelf");
+const panelDiscover = $("#panel-discover");
+const panelShelf = $("#panel-shelf");
+
+const shelfList = $("#shelf-list");
+const shelfEmpty = $("#shelf-empty");
+const shelfCount = $("#shelf-count");
+
+const dialog = $("#detail");
+const detailCover = $("#detail-cover");
+const detailTitle = $("#detail-title");
+const detailAuthor = $("#detail-author");
+const detailMeta = $("#detail-meta");
+const detailTags = $("#detail-tags");
+const detailStatus = $("#detail-status");
+const detailRemove = $("#detail-remove");
+const detailLink = $("#detail-link");
+
+/* ---------- state ---------- */
+const state = {
+  mode: "q",
+  query: "",
+  page: 1,
+  total: 0,
+  loaded: 0,
+  loading: false,
+  seen: new Set(),      // book ids already shown for this search
+  shelf: loadShelf(),   // { [bookId]: book + status + addedAt }
+  filter: "all",
+  current: null,        // book currently open in the dialog
+};
+
+/* ============================================================
+   Storage
+   ============================================================ */
+function loadShelf() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveShelf() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.shelf));
+  } catch {
+    /* storage can be blocked (private mode) — the app still works for this session */
+  }
+}
+
+/* ============================================================
+   Data helpers
+   ============================================================ */
+function buildUrl(mode, query, page) {
+  const params = new URLSearchParams({
+    limit: PAGE_SIZE,
+    page,
+    fields: FIELDS,
+  });
+  params.set(mode, query); // mode is "q", "title", "author" or "subject"
+  return `${API_URL}?${params}`;
+}
+
+function toBook(doc) {
+  return {
+    id: doc.key,
+    title: doc.title || "Untitled",
+    authors: doc.author_name || [],
+    year: doc.first_publish_year || null,
+    cover: doc.cover_i || null,
+    subjects: (doc.subject || []).slice(0, 6),
+    pages: doc.number_of_pages_median || null,
+  };
+}
+
+function coverUrl(coverId, size = "M") {
+  return `https://covers.openlibrary.org/b/id/${coverId}-${size}.jpg`;
+}
+
+// Same title → same colour, so fallback covers look stable.
+function colorFor(text) {
+  let hash = 0;
+  for (const ch of text) hash = (hash * 31 + ch.charCodeAt(0)) % 360;
+  return `hsl(${hash} 42% 32%)`;
+}
+
+function authorLine(book) {
+  if (!book.authors.length) return "Unknown author";
+  return book.authors.length > 2
+    ? `${book.authors[0]} +${book.authors.length - 1} more`
+    : book.authors.join(", ");
+}
+
+/* ============================================================
+   Building elements (textContent only — no innerHTML with API data)
+   ============================================================ */
+function makeFallback(book) {
+  const box = document.createElement("div");
+  box.className = "cover-fallback";
+  box.style.background = colorFor(book.title);
+  box.textContent = book.title;
+  return box;
+}
+
+function makeCoverImage(book, size) {
+  if (!book.cover) return makeFallback(book);
+
+  const img = document.createElement("img");
+  img.src = coverUrl(book.cover, size);
+  img.alt = `Cover of ${book.title}`;
+  img.width = 124;
+  img.height = 186;
+  img.loading = "lazy";
+  img.addEventListener("error", () => img.replaceWith(makeFallback(book)));
+  return img;
+}
+
+function makeBadge(status) {
+  const badge = document.createElement("span");
+  badge.className = "badge";
+  badge.dataset.status = status;
+  badge.textContent = STATUS_LABELS[status];
+  return badge;
+}
+
+function makeCard(book) {
+  const card = document.createElement("article");
+  card.className = "card";
+  card.dataset.id = book.id;
+
+  const slot = document.createElement("div");
+  slot.className = "slot";
+
+  const coverBtn = document.createElement("button");
+  coverBtn.type = "button";
+  coverBtn.className = "cover-btn";
+  coverBtn.setAttribute("aria-label", `Open details for ${book.title}`);
+  coverBtn.append(makeCoverImage(book, "M"));
+  coverBtn.addEventListener("click", () => openDetail(book));
+
+  slot.append(coverBtn);
+
+  const text = document.createElement("div");
+  text.className = "card-text";
+
+  const title = document.createElement("h3");
+  title.className = "card-title";
+  title.textContent = book.title;
+  title.title = book.title;
+
+  const sub = document.createElement("p");
+  sub.className = "card-sub";
+  sub.textContent = book.year ? `${authorLine(book)} · ${book.year}` : authorLine(book);
+
+  text.append(title, sub);
+  card.append(slot, text);
+
+  syncBadge(card, book.id);
+  return card;
+}
+
+function makeSkeleton() {
+  const card = document.createElement("div");
+  card.className = "card skeleton";
+  card.setAttribute("aria-hidden", "true");
+  card.innerHTML = `
+    <div class="slot"><div class="cover-btn"></div></div>
+    <div class="card-text"><div class="line"></div><div class="line short"></div></div>`;
+  return card;
+}
+
+// Adds / updates / removes the status ribbon on a card.
+function syncBadge(card, id) {
+  const coverBtn = $(".cover-btn", card);
+  const old = $(".badge", coverBtn);
+  if (old) old.remove();
+
+  const entry = state.shelf[id];
+  if (entry) coverBtn.append(makeBadge(entry.status));
+}
+
+function syncAllBadges() {
+  $$(".card[data-id]").forEach((card) => syncBadge(card, card.dataset.id));
+}
+
+/* ============================================================
+   Searching
+   ============================================================ */
+function setStatus(message, isError = false) {
+  statusEl.textContent = message;
+  statusEl.classList.toggle("is-error", isError);
+}
+
+function addSkeletons(count = 6) {
+  for (let i = 0; i < count; i++) resultsEl.append(makeSkeleton());
+}
+
+function removeSkeletons() {
+  $$(".skeleton", resultsEl).forEach((el) => el.remove());
+}
+
+async function runSearch({ reset }) {
+  if (state.loading) return;
+
+  if (reset) {
+    state.page = 1;
+    state.total = 0;
+    state.loaded = 0;
+    state.seen.clear();
+    resultsEl.replaceChildren();
+    loadMoreBtn.hidden = true;
+  }
+
+  state.loading = true;
+  resultsEl.setAttribute("aria-busy", "true");
+  loadMoreBtn.disabled = true;
+  addSkeletons();
+  setStatus(reset ? "Searching the stacks…" : "Fetching more books…");
+
+  try {
+    const response = await fetch(buildUrl(state.mode, state.query, state.page));
+    if (!response.ok) {
+      throw new Error(`Open Library answered with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    state.total = data.numFound || 0;
+
+    const fresh = (data.docs || [])
+      .map(toBook)
+      .filter((book) => !state.seen.has(book.id));
+
+    removeSkeletons();
+
+    fresh.forEach((book) => {
+      state.seen.add(book.id);
+      resultsEl.append(makeCard(book));
+    });
+
+    state.loaded += (data.docs || []).length;
+
+    if (state.seen.size === 0) {
+      setStatus(`No books found for “${state.query}”. Try another spelling or search type.`);
+    } else {
+      setStatus(
+        `Showing ${state.seen.size} of ${state.total.toLocaleString()} books for “${state.query}”`
+      );
+    }
+
+    loadMoreBtn.hidden = state.loaded >= state.total;
+  } catch (error) {
+    removeSkeletons();
+    console.error(error);
+    setStatus("Couldn’t reach the library. Check your connection and try again.", true);
+    // let the user retry the same page
+    loadMoreBtn.hidden = state.seen.size === 0;
+  } finally {
+    state.loading = false;
+    resultsEl.setAttribute("aria-busy", "false");
+    loadMoreBtn.disabled = false;
+  }
+}
+
+function startSearch(mode, query) {
+  const cleaned = query.trim();
+  if (cleaned.length < 2) return;
+
+  state.mode = mode;
+  state.query = cleaned;
+  modeSelect.value = mode;
+  queryInput.value = cleaned;
+  runSearch({ reset: true });
+}
+
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  startSearch(modeSelect.value, queryInput.value);
+});
+
+loadMoreBtn.addEventListener("click", () => {
+  state.page += 1;
+  runSearch({ reset: false });
+});
+
+$$(".chip").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    startSearch(chip.dataset.mode, chip.dataset.q);
+  });
+});
+
+/* ============================================================
+   Detail dialog
+   ============================================================ */
+function openDetail(book) {
+  state.current = book;
+
+  detailCover.replaceChildren(makeCoverImage(book, "L"));
+  detailTitle.textContent = book.title;
+  detailAuthor.textContent = book.authors.length ? book.authors.join(", ") : "Unknown author";
+
+  const meta = [];
+  if (book.year) meta.push(`First published ${book.year}`);
+  if (book.pages) meta.push(`${book.pages} pages`);
+  detailMeta.textContent = meta.join(" · ") || "No publication details available";
+
+  detailTags.replaceChildren(
+    ...book.subjects.map((subject) => {
+      const li = document.createElement("li");
+      li.textContent = subject;
+      return li;
+    })
+  );
+
+  detailLink.href = `https://openlibrary.org${book.id}`;
+
+  syncDetailButtons();
+  dialog.showModal();
+}
+
+function syncDetailButtons() {
+  const entry = state.current && state.shelf[state.current.id];
+
+  $$("button", detailStatus).forEach((btn) => {
+    btn.setAttribute("aria-pressed", String(!!entry && entry.status === btn.dataset.status));
+  });
+
+  detailRemove.hidden = !entry;
+}
+
+detailStatus.addEventListener("click", (event) => {
+  const btn = event.target.closest("button[data-status]");
+  if (!btn || !state.current) return;
+
+  const book = state.current;
+  const existing = state.shelf[book.id];
+
+  state.shelf[book.id] = {
+    ...book,
+    status: btn.dataset.status,
+    addedAt: existing ? existing.addedAt : Date.now(),
+  };
+
+  afterShelfChange();
+});
+
+detailRemove.addEventListener("click", () => {
+  if (!state.current) return;
+  delete state.shelf[state.current.id];
+  afterShelfChange();
+});
+
+function afterShelfChange() {
+  saveShelf();
+  syncDetailButtons();
+  syncAllBadges();
+  renderShelf();
+}
+
+$("#detail-close").addEventListener("click", () => dialog.close());
+
+// click on the dark backdrop closes the dialog
+dialog.addEventListener("click", (event) => {
+  if (event.target === dialog) dialog.close();
+});
+
+/* ============================================================
+   My shelf tab
+   ============================================================ */
+function renderShelf() {
+  const entries = Object.values(state.shelf).sort((a, b) => b.addedAt - a.addedAt);
+
+  // counts
+  const counts = { all: entries.length, want: 0, reading: 0, done: 0 };
+  entries.forEach((entry) => counts[entry.status]++);
+  $$("[data-count]").forEach((el) => (el.textContent = counts[el.dataset.count]));
+  shelfCount.textContent = counts.all;
+
+  // list
+  const visible = state.filter === "all"
+    ? entries
+    : entries.filter((entry) => entry.status === state.filter);
+
+  shelfList.replaceChildren(...visible.map(makeCard));
+  shelfEmpty.hidden = visible.length > 0;
+
+  shelfEmpty.textContent = "";
+  if (!visible.length) {
+    if (counts.all === 0) {
+      shelfEmpty.append("Nothing here yet. Open any book and tap ");
+      const strong = document.createElement("strong");
+      strong.textContent = "Want to read";
+      shelfEmpty.append(strong, " to start your shelf.");
+    } else {
+      shelfEmpty.textContent = "No books with this status yet.";
+    }
+  }
+}
+
+$("#shelf-filters").addEventListener("click", (event) => {
+  const btn = event.target.closest(".filter");
+  if (!btn) return;
+
+  state.filter = btn.dataset.filter;
+  $$(".filter").forEach((el) => el.classList.toggle("is-active", el === btn));
+  renderShelf();
+});
+
+/* ============================================================
+   Tabs
+   ============================================================ */
+function showTab(name) {
+  const onShelf = name === "shelf";
+
+  tabDiscover.setAttribute("aria-selected", String(!onShelf));
+  tabShelf.setAttribute("aria-selected", String(onShelf));
+  panelDiscover.hidden = onShelf;
+  panelShelf.hidden = !onShelf;
+
+  if (onShelf) renderShelf();
+}
+
+tabDiscover.addEventListener("click", () => showTab("discover"));
+tabShelf.addEventListener("click", () => showTab("shelf"));
+
+/* ============================================================
+   Start
+   ============================================================ */
+renderShelf();
+
+// Show something on first load so the page isn't empty.
+const starters = $$(".chip");
+const pick = starters[Math.floor(Math.random() * starters.length)];
+startSearch(pick.dataset.mode, pick.dataset.q);
+
+  </script>
+</body>
+</html>
